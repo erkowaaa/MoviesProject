@@ -8,7 +8,7 @@ from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import MovieFilter
 from rest_framework.filters import SearchFilter
-from .permissions import OwnerReadOnly
+
 
 
 class RegisterView(generics.CreateAPIView):
@@ -87,12 +87,15 @@ class MovieViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = MovieFilter
     search_fields = ['movie_name']
-    permission_classes = [OwnerReadOnly]
+    permission_classes = [permissions.AllowAny]
 
 
 class MovieListViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = MovieFilter
+    search_fields = ['movie_name']
 
 
 class RatingViewSet(viewsets.ModelViewSet):
@@ -103,4 +106,15 @@ class RatingViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    serializer_class = FavoriteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 

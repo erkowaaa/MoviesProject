@@ -2,7 +2,6 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import AbstractUser
 
-
 class UserProfile(AbstractUser):
     nickname = models.CharField(max_length=16)
     phone_number = PhoneNumberField(unique=True)
@@ -12,7 +11,6 @@ class UserProfile(AbstractUser):
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='simple')
-
 
     def __str__(self):
         return self.nickname
@@ -70,7 +68,7 @@ class Movie(models.Model):
     movie_name = models.CharField(max_length=100)
     release_date = models.DateField()
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    director = models.ForeignKey(Director, on_delete=models.CASCADE)
+    director = models.ManyToManyField(Director, related_name='movies')
     actors = models.ManyToManyField(Actor, related_name='movies')
     genres = models.ManyToManyField(Genre, related_name='movies')
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
@@ -80,7 +78,6 @@ class Movie(models.Model):
     movie_image = models.ImageField(upload_to='movies/images/', null=True, blank=True)
     movie_file = models.FileField(upload_to='movies/files/', null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Simple')
-    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.movie_name
@@ -110,4 +107,13 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.nickname} on {self.movie.movie_name}"
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='favorites')
+    movie = models.ForeignKey('Movie', on_delete=models.CASCADE, related_name='favorites')
+    added_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.movie_name}"
 

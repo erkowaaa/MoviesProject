@@ -3,6 +3,12 @@ from rest_framework import serializers
 from .models import *
 
 
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ['id', 'user', 'movie', 'added_date']
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
@@ -85,11 +91,12 @@ class RatingSerializer(serializers.ModelSerializer):
 
 class MovieListSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
-    ratings = RatingSerializer(many=True, read_only=True,)
+    country = CountrySerializer()
+    genres = GenreSerializerSimple(many=True, read_only=True)
 
     class Meta:
         model = Movie
-        fields = ['movie_name', 'movie_image', 'average_rating', 'release_date', 'country', 'genres', 'ratings']
+        fields = ['id','movie_name', 'movie_image', 'average_rating', 'release_date', 'country', 'genres']
 
     def get_average_rating(self, obj):
         return obj.get_average_rating()
@@ -97,20 +104,15 @@ class MovieListSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     country = CountrySerializer()
-    director = DirectorSerializerSimple()
+    director = DirectorSerializerSimple(many=True, read_only=True)
     actors = ActorSerializerSimple(many=True, read_only=True)
     genres = GenreSerializerSimple(many=True, read_only=True)
-    average_rating = serializers.SerializerMethodField()
     ratings = RatingSerializer(many=True, read_only=True)
-    owner = UserProfileSerializer()
 
     class Meta:
         model = Movie
         fields = ['movie_name', 'release_date', 'country', 'director', 'actors', 'genres', 'type', 'movie_time', 'description',
-                  'movie_trailer', 'movie_image', 'movie_file', 'average_rating', 'status', 'ratings', 'owner']
-
-    def get_average_rating(self, obj):
-        return obj.get_average_rating()
+                  'movie_trailer', 'movie_image', 'movie_file', 'status', 'ratings']
 
 
 class CommentSerializer(serializers.ModelSerializer):

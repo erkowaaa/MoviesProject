@@ -6,9 +6,7 @@ urlpatterns = [
     path('login/', CustomloginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
-    path('', MovieListViewSet.as_view({'get': 'list', 'post': 'create'}), name='movie_list'),
-
-    path('movies', MovieViewSet.as_view({'get': 'list', 'post': 'create'}), name='movies_list'),
+    path('movies/', MovieListViewSet.as_view({'get': 'list', 'post': 'create'}), name='movies_list'),
     path('movies/<int:pk>/', MovieViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='movies_detail'),
 
 
@@ -39,4 +37,7 @@ urlpatterns = [
 
     path('ratings/', RatingViewSet.as_view({'get': 'list', 'post': 'create'}), name='rating_list'),
     path('ratings/<int:pk>/', RatingViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='rating_detail'),
+
+    path('favorite/', FavoriteViewSet.as_view({'get': 'list', 'post': 'create'}), name='favorite_list'),
+    path('favorite/<int:pk>/', FavoriteViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='favorite_detail'),
 ]
